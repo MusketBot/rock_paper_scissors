@@ -1,20 +1,48 @@
 let humanScore = 0;
 let computerScore = 0;
+let roundsPlayed = 0;  // Counter for rounds
+const totalRounds = 5;  // Total rounds to play
 const choice = ['rock', 'paper', 'scissors'];
+const answer = document.querySelector('.answers');  // Where results will be shown
+const scoreBoard = document.querySelector('.scoreBoard');  // Where scores will be displayed
+const btnParent = document.getElementById('buttonParent');
 
-//getting computer choice.
+// Handle button clicks for player choice
+btnParent.addEventListener('click', function(event) {
+    if (event.target.tagName.toLowerCase() === 'button' && roundsPlayed < totalRounds) {
+        const btnSelection = event.target.innerText.toLowerCase();
+        const computerSelection = getComputerChoice();
+        
+        // Display the choices
+        answer.textContent = `Your choice: ${btnSelection}; Computer chooses: ${computerSelection}`;
+        
+        // Play the round and update the score
+        const roundResult = playRound(btnSelection, computerSelection);
+        answer.textContent += ` ${roundResult}`;
+        
+        // Update the score display
+        scoreBoard.textContent = `Your score: ${humanScore} | Computer score: ${computerScore}`;
+        
+        // Increment the rounds played
+        roundsPlayed++;
+        
+        // Check if the game is over
+        if (roundsPlayed === totalRounds) {
+            setTimeout(() => {
+                displayFinalResult();
+                disableButtons();
+            }, 500); // Wait a bit before displaying the final result
+        }
+    }
+});
+
+// Function to get a random computer choice
 function getComputerChoice() {
-  let generateNum = Math.floor(Math.random() * 3);
-  return choice[generateNum];
-}
-function getHumanChoice() {
-    let answer = prompt('What is your choice? (rock, paper, or scissors)').toLowerCase();
-    while (!choice.includes(answer)) {
-      answer = prompt('Invalid choice. Enter: "rock", "paper", "scissors"').toLowerCase();
-    } 
-    return answer;
+    let generateNum = Math.floor(Math.random() * 3);
+    return choice[generateNum];
 }
 
+// Function to play a round
 function playRound(humanChoice, computerChoice) {
     if (humanChoice === computerChoice) {
         return `A tie! Both chose ${humanChoice}.`;
@@ -26,26 +54,28 @@ function playRound(humanChoice, computerChoice) {
         (humanChoice === choice[1] && computerChoice === choice[0])
     ) {
         humanScore++;
-        return `You win! ${humanChoice} beats ${computerChoice}. Your score: ${humanScore}, Computer score: ${computerScore}`;
+        return `You win! ${humanChoice} beats ${computerChoice}.`;
     } else {
         computerScore++;
-        return `You lose! ${computerChoice} beats ${humanChoice}. Your Score: ${humanScore}, Computer score: ${computerScore}`;
+        return `You lose! ${computerChoice} beats ${humanChoice}.`;
     }
 }
 
-function playGame() {
-    for (let round = 1; round <= 5; round++) {
-      console.log(`Round ${round}:`);
-      const humanSelection = getHumanChoice();
-      const computerSelection  = getComputerChoice();
-      console.log(playRound(humanSelection, computerSelection));
-    }
+// Function to display the final result after 5 rounds
+function displayFinalResult() {
     if (humanScore > computerScore) {
-      return `Game over! You win the game! Final score - You: ${humanScore}, Computer: ${computerScore}`;
-    } else if (humanScore< computerScore) {
-      return `Game over! You lose the game! Final score - You: ${humanScore}, Computer score: ${computerScore}`;
+        answer.textContent = `Game over! You win the game! Final score - You: ${humanScore}, Computer: ${computerScore}`;
+    } else if (humanScore < computerScore) {
+        answer.textContent = `Game over! You lose the game! Final score - You: ${humanScore}, Computer: ${computerScore}`;
     } else {
-      return `Game over! It's a tie! Final score - You: ${humanScore}, Computer: ${computerScore}`;
+        answer.textContent = `Game over! It's a tie! Final score - You: ${humanScore}, Computer: ${computerScore}`;
     }
 }
-console.log(playGame());
+
+// Function to disable the buttons after the game ends
+function disableButtons() {
+    const buttons = btnParent.querySelectorAll('button');
+    buttons.forEach(button => {
+        button.disabled = true;  // Disable each button
+    });
+}
